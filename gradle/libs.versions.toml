@@ -9,23 +9,41 @@ kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.10.2"
 springBoot = "3.5.8"
 conventionalCommits = "3.1.3"
+flyway = "11.13.2"
+jjwt = "0.12.6"
+jaxbApi = "2.3.0"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinAllopenGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
+kotlinNoargGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-noarg", version.ref = "kotlin" }
+kotlinSerializationGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
 springBootDependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+springBootGradlePlugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "springBoot" }
+springBootStarterDataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+flywayCore = { module = "org.flywaydb:flyway-core" }
+springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBootDevtools = { module = "org.springframework.boot:spring-boot-devtools" }
+flywayDatabasePostgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+postgresql = { module = "org.postgresql:postgresql" }
+kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinxCoroutines" }
+reactorKotlinExtensions = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
+jaxbApi = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxbApi" }
 conventionalCommitsGradlePlugin = { module = "it.nicolasfarabegoli.conventional-commits:it.nicolasfarabegoli.conventional-commits.gradle.plugin", version.ref = "conventionalCommits" }
+flywayGradlePlugin = { module = "org.flywaydb:flyway-gradle-plugin", version.ref = "flyway" }
 
 # Libraries can be bundled together for easier import
 [bundles]
 kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
 
 [plugins]
-conventionalCommits = { id = "it.nicolasfarabegoli.conventional-commits", version.ref = "conventionalCommits" }
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinPluginSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }

@@ -12,6 +12,11 @@ kotlin {
 dependencies {
     // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
     implementation(libs.kotlinGradlePlugin)
+    implementation(libs.kotlinAllopenGradlePlugin)
+    implementation(libs.kotlinNoargGradlePlugin)
+    implementation(libs.kotlinSerializationGradlePlugin)
+    implementation(libs.springBootGradlePlugin)
+    implementation(libs.flywayGradlePlugin)
     // Makes the external plugin available to the precompiled convention plugin.
     implementation(libs.conventionalCommitsGradlePlugin)
 }
