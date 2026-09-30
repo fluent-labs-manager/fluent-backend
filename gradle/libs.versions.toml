@@ -8,6 +8,7 @@ kotlinxDatetime = "0.8.0"
 kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.10.2"
 springBoot = "3.5.8"
+conventionalCommits = "3.1.3"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -17,12 +18,14 @@ kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", 
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
 springBootDependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+conventionalCommitsGradlePlugin = { module = "it.nicolasfarabegoli.conventional-commits:it.nicolasfarabegoli.conventional-commits.gradle.plugin", version.ref = "conventionalCommits" }
 
 # Libraries can be bundled together for easier import
 [bundles]
 kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
 
 [plugins]
+conventionalCommits = { id = "it.nicolasfarabegoli.conventional-commits", version.ref = "conventionalCommits" }
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinPluginSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
