@@ -1,16 +1,12 @@
 plugins {
-    id("buildsrc.convention.kotlin-jvm")
-    alias(libs.plugins.kotlinPluginSpring)
-    alias(libs.plugins.springBoot)
+    id("buildsrc.convention.spring-app")
+    id("buildsrc.convention.postgres-plugin")
+    id("buildsrc.convention.security-plugin")
+    id("buildsrc.convention.mapstruct")
 }
 
 dependencies {
     implementation(project(":core"))
-
-    implementation(platform(libs.springBootDependencies))
-    implementation(libs.springBootStarterWeb)
-
-    testImplementation(libs.springBootStarterTest)
 }
 
 tasks.bootJar {
