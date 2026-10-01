@@ -8,6 +8,18 @@ on:
     branches: [ main, dev ]
 
 jobs:
+  resolve-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
+
+    steps:
+      - name: Resolve deployment environment
+        id: resolve
+        env:
+          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+        run: .github/scripts/resolve-environment.sh
+
   markdown-formatting:
     timeout-minutes: 5
     runs-on: ubuntu-latest
@@ -23,7 +35,8 @@ jobs:
 
   send-commits-notification:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    needs: [ resolve-environment ]
+    environment: ${{ needs.resolve-environment.outputs.deployment_environment }}
 
     steps:
       - uses: actions/checkout@v6
