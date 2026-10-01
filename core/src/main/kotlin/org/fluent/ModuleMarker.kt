@@ -1,4 +1,4 @@
-package org.fluent.core
+package org.fluent
 
 /**
  * Temporary marker for the shared module.
