@@ -3,7 +3,6 @@ name: "Fluent backend CI"
 on:
   pull_request:
     types: [ opened, synchronize, reopened ]
-    branches: [ main, dev ]
   push:
     branches: [ main, dev ]
 
@@ -32,6 +31,20 @@ jobs:
         with:
           files: .
           config_file: .markdownlint.yaml
+
+  test-modules:
+    needs: resolve-environment
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ api-entrypoint, core ]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run unit-tests
+        run: echo "Unit tests"
 
   send-commits-notification:
     runs-on: ubuntu-latest
