@@ -13,6 +13,8 @@ jobs:
       deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
 
     steps:
+      - uses: actions/checkout@v6
+
       - name: Resolve deployment environment
         id: resolve
         env:
