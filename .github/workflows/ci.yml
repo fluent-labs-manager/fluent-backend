@@ -55,6 +55,8 @@ jobs:
       core-changes: ${{ steps.resolve-core-change.outputs.core-changed }}
 
     steps:
+      - uses: actions/checkout@v6
+
       - name: Resolve core changes
         id: resolve-core-change
         run: .github/scripts/resolve-service-changes.sh
