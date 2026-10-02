@@ -46,6 +46,47 @@ jobs:
       - name: Run unit-tests
         run: echo "Unit tests"
 
+  define-core-change:
+    needs: [ resolve-environment ]
+    runs-on: ubuntu-latest
+    outputs:
+      core-changes: ${{ steps.resolve-core-change.outputs.core-changed }}
+
+    steps:
+      - name: Resolve core changes
+        id: resolve-core-change
+        run: .github/scripts/resolve-service-changes.sh
+        env:
+          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+          SERVICE_NAME: "core"
+
+  build-docker-images:
+    needs:
+      - resolve-environment
+      - define-core-change
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ api-entrypoint ]
+
+    steps:
+      - name: Resolve service change
+        id: resolve-change
+        run: .github/scripts/resolve-service-changes.sh
+        env:
+          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+          SERVICE_NAME: ${{ matrix.module }}
+
+      - name: build-image
+        if: >-
+          steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' ||
+          needs.define-core-change.outputs.core-changes == 'true'
+        run: echo "Create docker"
+
   send-commits-notification:
     runs-on: ubuntu-latest
     needs: [ resolve-environment ]
