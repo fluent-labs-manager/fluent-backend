@@ -103,7 +103,7 @@ jobs:
         id: prepare
         env:
           COMMITS_JSON: ${{ toJSON(github.event.commits) }}
-        run: .github/scripts/prepare-commits.sh
+        run: .github/scripts/prepare-commit.sh
 
       - name: Send TG message
         uses: appleboy/telegram-action@214f06cfa3d3a588c1472116889437e7c6fd29b1
