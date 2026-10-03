@@ -1,0 +1,142 @@
+name: "Fluent backend CI"
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  push:
+    branches: [ main, dev ]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve deployment environment
+        id: resolve
+        env:
+          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+        run: .github/scripts/resolve-environment.sh
+
+  markdown-formatting:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run mdl for check markdown formatting
+        uses: nosborn/github-action-markdown-cli@v3.3.0
+        with:
+          files: .
+          config_file: .markdownlint.yaml
+
+  test-modules:
+    needs: resolve-environment
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ api-entrypoint, core ]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run unit-tests
+        run: echo "Unit tests"
+
+  define-core-change:
+    needs: [ resolve-environment ]
+    runs-on: ubuntu-latest
+    outputs:
+      core-changes: ${{ steps.resolve-core-change.outputs.core-changed }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve core changes
+        id: resolve-core-change
+        run: .github/scripts/resolve-service-changes.sh
+        env:
+          SERVICE_NAME: "core"
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+  build-docker-images:
+    needs:
+      - resolve-environment
+      - define-core-change
+      - test-modules
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ api-entrypoint ]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve service change
+        id: resolve-change
+        run: .github/scripts/resolve-service-changes.sh
+        env:
+          SERVICE_NAME: ${{ matrix.module }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - name: Build docker-image
+        if: >-
+          steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' ||
+          needs.define-core-change.outputs.core-changes == 'true'
+        run: echo "Create docker"
+
+      - name: Publish docker-images
+        if: >-
+          github.event_name == 'push' && 
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
+          (steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' || needs.define-core-change.outputs.core-changes == 'true')
+        run: echo "Publishing"
+
+  send-commits-notification:
+    runs-on: ubuntu-latest
+    needs: [ resolve-environment ]
+    environment: ${{ needs.resolve-environment.outputs.deployment_environment }}
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Prepare commit message
+        id: prepare
+        env:
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+        run: .github/scripts/prepare-commit.sh
+
+      - name: Send TG message
+        uses: appleboy/telegram-action@214f06cfa3d3a588c1472116889437e7c6fd29b1
+        with:
+          to: ${{ secrets.CHAT_ID }}
+          token: ${{ secrets.BOT_TOKEN }}
+          message: |
+            New commits in ${{ github.repository }}
+
+            ${{ github.actor }} has pushed ${{ steps.prepare.outputs.count }} commit(-s) to ${{ github.ref_name }}
+
+            ${{ steps.prepare.outputs.commit_list }}
+
+            🔗 ${{ github.server_url }}/${{ github.repository }}/commits/${{ github.ref_name }}
+
+            #commit
