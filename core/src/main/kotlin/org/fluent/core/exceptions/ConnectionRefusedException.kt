@@ -1,6 +1,6 @@
-package org.fluent.exceptions
+package org.fluent.core.exceptions
 
-import org.fluent.enums.MicroserviceName
+import org.fluent.core.enums.MicroserviceName
 
 class ConnectionRefusedException(
     override val message: String,

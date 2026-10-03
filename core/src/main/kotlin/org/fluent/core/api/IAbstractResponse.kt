@@ -1,4 +1,4 @@
-package org.fluent.api
+package org.fluent.core.api
 
 interface IAbstractResponse<T> {
     val status: Int

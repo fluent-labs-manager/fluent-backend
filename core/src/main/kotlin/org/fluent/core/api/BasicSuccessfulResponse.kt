@@ -1,4 +1,4 @@
-package org.fluent.api
+package org.fluent.core.api
 
 data class BasicSuccessfulResponse<T>(
     override val message: T,

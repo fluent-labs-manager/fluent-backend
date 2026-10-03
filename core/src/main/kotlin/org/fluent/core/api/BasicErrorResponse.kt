@@ -1,4 +1,4 @@
-package org.fluent.api
+package org.fluent.core.api
 
 data class BasicErrorResponse(
     override val status: Int,

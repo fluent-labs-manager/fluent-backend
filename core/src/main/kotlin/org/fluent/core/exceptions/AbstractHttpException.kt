@@ -1,4 +1,4 @@
-package org.fluent.exceptions
+package org.fluent.core.exceptions
 
 abstract class AbstractHttpException(
     open val statusCode: Int,

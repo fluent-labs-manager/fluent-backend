@@ -1,4 +1,4 @@
-package org.fluent.api
+package org.fluent.core.api
 
 interface IConvertableToHttpResponse<T> {
     fun T.toHttpResponse(): BasicSuccessfulResponse<T> {

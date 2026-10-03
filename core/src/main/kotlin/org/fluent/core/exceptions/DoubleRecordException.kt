@@ -1,4 +1,4 @@
-package org.fluent.exceptions
+package org.fluent.core.exceptions
 
 class DoubleRecordException(
     override val message: String,

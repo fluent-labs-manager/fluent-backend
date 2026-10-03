@@ -1,4 +1,4 @@
-package org.fluent.enums
+package org.fluent.core.enums
 
 enum class MicroserviceName {
     API_ENTRYPOINT,
