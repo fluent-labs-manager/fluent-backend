@@ -38,8 +38,26 @@ jobs:
           files: .
           config_file: .markdownlint.yaml
 
+  warm-gradle-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Warm Gradle build cache
+        run: ./gradlew testClasses
+
   test-modules:
-    needs: resolve-environment
+    needs: [ resolve-environment, warm-gradle-cache ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -51,6 +69,12 @@ jobs:
 
       - name: Set up JDK
         uses: ./.github/actions/setup-java
+
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
 
       - name: Run unit-tests
         run: ./gradlew :${{ matrix.module }}:test -PexcludeTestTags=requires-infrastructure
