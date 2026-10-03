@@ -56,13 +56,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Resolve core changes
         id: resolve-core-change
         run: .github/scripts/resolve-service-changes.sh
         env:
-          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
           SERVICE_NAME: "core"
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
   build-docker-images:
     needs:
@@ -71,7 +74,6 @@ jobs:
       - test-modules
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
 
     strategy:
       fail-fast: false
@@ -79,18 +81,30 @@ jobs:
         module: [ api-entrypoint ]
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Resolve service change
         id: resolve-change
         run: .github/scripts/resolve-service-changes.sh
         env:
-          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
           SERVICE_NAME: ${{ matrix.module }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
-      - name: build-image
+      - name: Build docker-image
         if: >-
           steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' ||
           needs.define-core-change.outputs.core-changes == 'true'
         run: echo "Create docker"
+
+      - name: Publish docker-images
+        if: >-
+          github.event_name == 'push' && 
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
+          (steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' || needs.define-core-change.outputs.core-changes == 'true')
+        run: echo "Publishing"
 
   send-commits-notification:
     runs-on: ubuntu-latest
