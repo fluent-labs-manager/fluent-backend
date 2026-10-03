@@ -49,6 +49,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
       - name: Run unit-tests
         run: ./gradlew :${{ matrix.module }}:test -PexcludeTestTags=requires-infrastructure
 
