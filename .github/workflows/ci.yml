@@ -11,6 +11,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-affected-modules:
+    runs-on: ubuntu-latest
+    outputs:
+      test_matrix: ${{ steps.detect.outputs.test_matrix }}
+      image_matrix: ${{ steps.detect.outputs.image_matrix }}
+      test_tasks: ${{ steps.detect.outputs.test_tasks }}
+      has_tests: ${{ steps.detect.outputs.has_tests }}
+      has_images: ${{ steps.detect.outputs.has_images }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check change detection rules
+        run: python3 -B -m unittest discover -s .github/scripts -p 'test_detect_affected_modules.py'
+
+      - name: Detect affected modules and services
+        id: detect
+        run: python3 .github/scripts/detect-affected-modules.py
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
   resolve-environment:
     runs-on: ubuntu-latest
     outputs:
@@ -39,6 +62,8 @@ jobs:
           config_file: .markdownlint.yaml
 
   warm-gradle-cache:
+    needs: detect-affected-modules
+    if: needs.detect-affected-modules.outputs.has_tests == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -54,18 +79,21 @@ jobs:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Warm Gradle build cache
-        run: ./gradlew testClasses
+        env:
+          GRADLE_TEST_TASKS: ${{ needs.detect-affected-modules.outputs.test_tasks }}
+        run: |
+          read -r -a tasks <<< "$GRADLE_TEST_TASKS"
+          ./gradlew "${tasks[@]}"
 
   test-modules:
     needs:
-      - resolve-environment
+      - detect-affected-modules
       - warm-gradle-cache
-
+    if: needs.detect-affected-modules.outputs.has_tests == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        module: [ api-entrypoint, core ]
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.test_matrix) }}
 
     steps:
       - uses: actions/checkout@v6
@@ -82,62 +110,46 @@ jobs:
       - name: Run unit-tests
         run: ./gradlew :${{ matrix.module }}:test -PexcludeTestTags=requires-infrastructure
 
-  define-core-change:
-    needs: resolve-environment
-    runs-on: ubuntu-latest
-    outputs:
-      core-changes: ${{ steps.resolve-core-change.outputs.core-changed }}
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Resolve core changes
-        id: resolve-core-change
-        run: .github/scripts/resolve-service-changes.sh
-        env:
-          SERVICE_NAME: "core"
-          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-
   build-docker-images:
     needs:
-      - resolve-environment
-      - define-core-change
+      - detect-affected-modules
       - test-modules
-
+    if: needs.detect-affected-modules.outputs.has_images == 'true'
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      matrix:
-        module: [ api-entrypoint ]
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
-      - name: Resolve service change
-        id: resolve-change
-        run: .github/scripts/resolve-service-changes.sh
-        env:
-          SERVICE_NAME: ${{ matrix.module }}
-          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
 
       - name: Build docker-image
-        if: >-
-          steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' ||
-          needs.define-core-change.outputs.core-changes == 'true'
         run: echo "Create docker"
 
+      - name: Install Doppler CLI
+        if: github.event_name == 'push'
+        uses: dopplerhq/cli-action@v4
+
+      - name: Load Docker Hub credentials from Doppler
+        if: github.event_name == 'push'
+        shell: bash
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_DOCKERHUB_TOKEN }}
+        run: .github/scripts/prepare-dockerhub-creditials.sh
+
+      - name: Log in to DockerHub
+        if: github.event_name == 'push'
+        uses: ./.github/actions/login-docker
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          token: ${{ env.DOCKERHUB_TOKEN }}
+
       - name: Publish docker-images
-        if: >-
-          github.event_name == 'push' && 
-          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&
-          (steps.resolve-change.outputs[format('{0}-changed', matrix.module)] == 'true' || needs.define-core-change.outputs.core-changes == 'true')
+        if: github.event_name == 'push'
         run: echo "Publishing"
 
   send-commits-notification:
