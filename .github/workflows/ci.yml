@@ -207,6 +207,62 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.module }}
           cache-to: type=gha,mode=max,scope=${{ matrix.module }}
 
+  deploy-production-containers:
+    name: Deploy updated production-images to server
+    needs:
+      - detect-affected-modules
+      - build-docker-images
+
+    if: >-
+      github.event_name == 'push' &&
+      github.ref_name == 'main' &&
+      needs.detect-affected-modules.outputs.has_images == 'true' &&
+      needs.build-docker-images.result == 'success'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure SSH
+        run: .github/scripts/setup-ssh.sh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Pull images and recreate services
+        env:
+          SERVER_HOST: ${{ secrets.SSH_HOST }}
+          SERVER_USER: ${{ secrets.SSH_USER }}
+        run: .github/scripts/pull-production-images.sh
+
+  deploy-dev-containers:
+    name: Deploy updated dev-images to server
+    needs:
+      - detect-affected-modules
+      - build-docker-images
+
+    if: >-
+      github.event_name == 'push' &&
+      github.ref_name == 'dev' &&
+      needs.detect-affected-modules.outputs.has_images == 'true' &&
+      needs.build-docker-images.result == 'success'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure SSH
+        run: .github/scripts/setup-ssh.sh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Pull images and recreate services
+        env:
+          SERVER_HOST: ${{ secrets.SSH_HOST }}
+          SERVER_USER: ${{ secrets.SSH_USER }}
+        run: .github/scripts/pull-dev-images.sh
+
   send-commits-notification:
     runs-on: ubuntu-latest
     needs: resolve-environment
