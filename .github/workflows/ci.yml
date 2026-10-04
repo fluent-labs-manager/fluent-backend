@@ -116,7 +116,7 @@ jobs:
     needs:
       - detect-affected-modules
       - test-modules
-    if: needs.detect-affected-modules.outputs.has_images == 'true'
+    if: github.event_name == 'push' && needs.detect-affected-modules.outputs.has_images == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -129,30 +129,42 @@ jobs:
       - name: Set up JDK
         uses: ./.github/actions/setup-java
 
-      - name: Build docker-image
-        run: echo "Create docker"
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+
+      - name: Build application JAR
+        run: ./gradlew :${{ matrix.module }}:bootJar
 
       - name: Install Doppler CLI
-        if: github.event_name == 'push'
         uses: dopplerhq/cli-action@v4
 
       - name: Load Docker Hub credentials from Doppler
-        if: github.event_name == 'push'
         shell: bash
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_DOCKERHUB_TOKEN }}
         run: .github/scripts/prepare-dockerhub-creditials.sh
 
-      - name: Log in to DockerHub
-        if: github.event_name == 'push'
-        uses: ./.github/actions/login-docker
+      - name: Setup Docker
+        uses: ./.github/actions/setup-docker
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           token: ${{ env.DOCKERHUB_TOKEN }}
 
-      - name: Publish docker-images
-        if: github.event_name == 'push'
-        run: echo "Publishing"
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.module }}
+          file: ./${{ matrix.module }}/Dockerfile
+          push: true
+          tags: |
+            scobca/${{ matrix.module }}:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
+            scobca/${{ matrix.module }}:sha-${{ github.sha }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=${{ matrix.module }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.module }}
 
   send-commits-notification:
     runs-on: ubuntu-latest
