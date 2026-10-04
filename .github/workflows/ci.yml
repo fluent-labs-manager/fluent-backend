@@ -201,8 +201,8 @@ jobs:
           file: ./${{ matrix.module }}/Dockerfile
           push: true
           tags: |
-            scobca/${{ matrix.module }}:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
-            scobca/${{ matrix.module }}:sha-${{ github.sha }}
+            scobca/fluent-${{ matrix.module }}:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
+            scobca/fluent-${{ matrix.module }}:sha-${{ github.sha }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=${{ matrix.module }}
           cache-to: type=gha,mode=max,scope=${{ matrix.module }}
