@@ -12,7 +12,10 @@ plugins {
 }
 
 dependencies {
-    add("implementation", platform(libs.findLibrary("springBootDependencies").get()))
+    val springBootBom = platform(libs.findLibrary("springBootDependencies").get())
+
+    add("implementation", springBootBom)
+    add("developmentOnly", springBootBom)
     add("implementation", libs.findLibrary("springBootStarterWeb").get())
     add("implementation", libs.findLibrary("springBootStarterValidation").get())
     add("implementation", libs.findLibrary("kotlinReflect").get())
