@@ -112,6 +112,47 @@ jobs:
       - name: Run unit-tests
         run: ./gradlew :${{ matrix.module }}:test -PexcludeTestTags=requires-infrastructure
 
+  check-pr-docker-images:
+    needs:
+      - detect-affected-modules
+      - test-modules
+    if: github.event_name == 'pull_request' && needs.detect-affected-modules.outputs.has_images == 'true'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+
+      - name: Build application JAR
+        run: ./gradlew :${{ matrix.module }}:bootJar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Check Docker image build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.module }}
+          file: ./${{ matrix.module }}/Dockerfile
+          push: false
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=${{ matrix.module }}
+
   build-docker-images:
     needs:
       - detect-affected-modules
