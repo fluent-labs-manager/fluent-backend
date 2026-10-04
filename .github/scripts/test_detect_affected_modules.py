@@ -53,6 +53,12 @@ class AffectedModulesTests(unittest.TestCase):
         self.assertEqual(result["has_tests"], "true")
         self.assertEqual(result["has_images"], "true")
 
+    def test_missing_base_commit_selects_every_module(self):
+        paths = detector.changed_files(
+            "f" * 40, detector.git("rev-parse", "HEAD"), "pull_request"
+        )
+        self.assertIsNone(paths)
+
     def test_dependencies_are_followed_transitively(self):
         modules = ["base", "middle", "service"]
         dependencies = {"base": set(), "middle": {"base"}, "service": {"middle"}}

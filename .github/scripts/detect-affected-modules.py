@@ -19,6 +19,16 @@ def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
+def commit_exists(sha: str) -> bool:
+    return subprocess.run(
+        ["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+        cwd=ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    ).returncode == 0
+
+
 def modules_and_dependencies() -> tuple[list[str], dict[str, set[str]]]:
     settings = (ROOT / "settings.gradle.kts").read_text()
     modules = [
@@ -50,8 +60,16 @@ def changed_files(base: str, head: str, event_name: str) -> list[str] | None:
     if not base or base == ZERO_SHA or not head:
         return None  # Initial push: check every module.
 
+    if not commit_exists(base) or not commit_exists(head):
+        print("Comparison commit is unavailable; checking every module")
+        return None
+
     if event_name == "pull_request":
-        base = git("merge-base", base, head)
+        try:
+            base = git("merge-base", base, head)
+        except subprocess.CalledProcessError:
+            print("No common ancestor found; checking every module")
+            return None
 
     output = subprocess.check_output(
         ["git", "diff", "--no-renames", "--name-only", "-z", base, head], cwd=ROOT
