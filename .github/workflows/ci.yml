@@ -21,7 +21,7 @@ jobs:
       has_images: ${{ steps.detect.outputs.has_images }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -42,7 +42,7 @@ jobs:
       deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Resolve deployment environment
         id: resolve
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Run mdl for check markdown formatting
         uses: nosborn/github-action-markdown-cli@v3.3.0
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: ./.github/actions/setup-java
@@ -98,7 +98,7 @@ jobs:
       matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.test_matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: ./.github/actions/setup-java
@@ -124,7 +124,7 @@ jobs:
       matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: ./.github/actions/setup-java
@@ -145,7 +145,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Check Docker image build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./${{ matrix.module }}
           file: ./${{ matrix.module }}/Dockerfile
@@ -165,7 +165,7 @@ jobs:
       matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: ./.github/actions/setup-java
@@ -195,7 +195,7 @@ jobs:
           token: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./${{ matrix.module }}
           file: ./${{ matrix.module }}/Dockerfile
@@ -270,7 +270,7 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Prepare commit message
         id: prepare
