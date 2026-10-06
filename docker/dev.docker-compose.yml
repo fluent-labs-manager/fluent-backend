@@ -12,13 +12,13 @@ services:
       - fluent-dev-net
 
   api-entrypoint-pg:
-    image: postgres:latest
+    image: postgres:18
     restart: always
     environment:
       POSTGRES_USER: ${API_ENTRYPOINT_DB_USER}
       POSTGRES_PASSWORD: ${API_ENTRYPOINT_DB_PASSWORD}
     volumes:
-      - api-entrypoint-pg-data:/var/lib/postgresql/data
+      - api-entrypoint-pg-data:/var/lib/postgresql
     ports:
       - "17100:5432"
     networks:
