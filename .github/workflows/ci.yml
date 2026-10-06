@@ -1,0 +1,295 @@
+name: "Fluent backend CI"
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  push:
+    branches: [ main, dev ]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-affected-modules:
+    runs-on: ubuntu-latest
+    outputs:
+      test_matrix: ${{ steps.detect.outputs.test_matrix }}
+      image_matrix: ${{ steps.detect.outputs.image_matrix }}
+      test_tasks: ${{ steps.detect.outputs.test_tasks }}
+      has_tests: ${{ steps.detect.outputs.has_tests }}
+      has_images: ${{ steps.detect.outputs.has_images }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check change detection rules
+        run: python3 -B -m unittest discover -s .github/scripts -p 'test_detect_affected_modules.py'
+
+      - name: Detect affected modules and services
+        id: detect
+        run: python3 .github/scripts/detect-affected-modules.py
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+  resolve-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve deployment environment
+        id: resolve
+        env:
+          BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+        run: .github/scripts/resolve-environment.sh
+
+  markdown-formatting:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run mdl for check markdown formatting
+        uses: nosborn/github-action-markdown-cli@v3.3.0
+        with:
+          files: .
+          config_file: .markdownlint.yaml
+
+  warm-gradle-cache:
+    needs: detect-affected-modules
+    if: needs.detect-affected-modules.outputs.has_tests == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Warm Gradle build cache
+        env:
+          GRADLE_TEST_TASKS: ${{ needs.detect-affected-modules.outputs.test_tasks }}
+        run: |
+          read -r -a tasks <<< "$GRADLE_TEST_TASKS"
+          ./gradlew "${tasks[@]}"
+
+  test-modules:
+    needs:
+      - detect-affected-modules
+      - warm-gradle-cache
+    if: needs.detect-affected-modules.outputs.has_tests == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.test_matrix) }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+
+      - name: Run unit-tests
+        run: ./gradlew :${{ matrix.module }}:test -PexcludeTestTags=requires-infrastructure
+
+  check-pr-docker-images:
+    needs:
+      - detect-affected-modules
+      - test-modules
+    if: github.event_name == 'pull_request' && needs.detect-affected-modules.outputs.has_images == 'true'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+
+      - name: Build application JAR
+        run: ./gradlew :${{ matrix.module }}:bootJar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Check Docker image build
+        uses: docker/build-push-action@v7
+        with:
+          context: ./${{ matrix.module }}
+          file: ./${{ matrix.module }}/Dockerfile
+          push: false
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=${{ matrix.module }}
+
+  build-docker-images:
+    needs:
+      - detect-affected-modules
+      - test-modules
+    if: github.event_name == 'push' && needs.detect-affected-modules.outputs.has_images == 'true'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-affected-modules.outputs.image_matrix) }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Restore Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: true
+
+      - name: Build application JAR
+        run: ./gradlew :${{ matrix.module }}:bootJar
+
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v4
+
+      - name: Load Docker Hub credentials from Doppler
+        shell: bash
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_DOCKERHUB_TOKEN }}
+        run: .github/scripts/prepare-dockerhub-creditials.sh
+
+      - name: Setup Docker
+        uses: ./.github/actions/setup-docker
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          token: ${{ env.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./${{ matrix.module }}
+          file: ./${{ matrix.module }}/Dockerfile
+          push: true
+          tags: |
+            scobca/fluent-${{ matrix.module }}:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
+            scobca/fluent-${{ matrix.module }}:sha-${{ github.sha }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=${{ matrix.module }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.module }}
+
+  deploy-production-containers:
+    name: Deploy updated production-images to server
+    needs:
+      - detect-affected-modules
+      - build-docker-images
+
+    if: >-
+      github.event_name == 'push' &&
+      github.ref_name == 'main' &&
+      needs.detect-affected-modules.outputs.has_images == 'true' &&
+      needs.build-docker-images.result == 'success'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure SSH
+        run: .github/scripts/setup-ssh.sh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Pull images and recreate services
+        env:
+          SERVER_HOST: ${{ secrets.SSH_HOST }}
+          SERVER_USER: ${{ secrets.SSH_USER }}
+        run: .github/scripts/pull-production-images.sh
+
+  deploy-dev-containers:
+    name: Deploy updated dev-images to server
+    needs:
+      - detect-affected-modules
+      - build-docker-images
+
+    if: >-
+      github.event_name == 'push' &&
+      github.ref_name == 'dev' &&
+      needs.detect-affected-modules.outputs.has_images == 'true' &&
+      needs.build-docker-images.result == 'success'
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure SSH
+        run: .github/scripts/setup-ssh.sh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: Pull images and recreate services
+        env:
+          SERVER_HOST: ${{ secrets.SSH_HOST }}
+          SERVER_USER: ${{ secrets.SSH_USER }}
+        run: .github/scripts/pull-dev-images.sh
+
+  send-commits-notification:
+    runs-on: ubuntu-latest
+    needs: resolve-environment
+    environment: ${{ needs.resolve-environment.outputs.deployment_environment }}
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Prepare commit message
+        id: prepare
+        env:
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+        run: .github/scripts/prepare-commit.sh
+
+      - name: Send TG message
+        uses: appleboy/telegram-action@214f06cfa3d3a588c1472116889437e7c6fd29b1
+        with:
+          to: ${{ secrets.CHAT_ID }}
+          token: ${{ secrets.BOT_TOKEN }}
+          message: |
+            New commits in ${{ github.repository }}
+
+            ${{ github.actor }} has pushed ${{ steps.prepare.outputs.count }} commit(-s) to ${{ github.ref_name }}
+
+            ${{ steps.prepare.outputs.commit_list }}
+
+            🔗 ${{ github.server_url }}/${{ github.repository }}/commits/${{ github.ref_name }}
+
+            #commit

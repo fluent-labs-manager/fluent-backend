@@ -12,7 +12,10 @@ plugins {
 }
 
 dependencies {
-    add("implementation", platform(libs.findLibrary("springBootDependencies").get()))
+    val springBootBom = platform(libs.findLibrary("springBootDependencies").get())
+
+    add("implementation", springBootBom)
+    add("developmentOnly", springBootBom)
     add("implementation", libs.findLibrary("springBootStarterWeb").get())
     add("implementation", libs.findLibrary("springBootStarterValidation").get())
     add("implementation", libs.findLibrary("kotlinReflect").get())
@@ -23,4 +26,22 @@ dependencies {
 
     add("developmentOnly", libs.findLibrary("springBootDevtools").get())
     add("testImplementation", libs.findLibrary("springBootStarterTest").get())
+}
+
+val excludedTestTags = providers.gradleProperty("excludeTestTags").orNull
+
+tasks.withType<Test> {
+    useJUnitPlatform {
+        excludedTestTags
+            ?.split(",")
+            ?.map(String::trim)
+            ?.filter(String::isNotBlank)
+            ?.let { excludeTags(*it.toTypedArray()) }
+    }
+
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+
+    filter {
+        isFailOnNoMatchingTests = false
+    }
 }

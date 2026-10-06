@@ -1,0 +1,48 @@
+name: "fluent-prod"
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    volumes:
+      - redis-data:/data
+    ports:
+      - "7200:6379"
+    networks:
+      - fluent-prod-net
+
+  api-entrypoint-pg:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - ./prod.env
+    environment:
+      POSTGRES_USER: ${API_ENTRYPOINT_DB_USER}
+      POSTGRES_PASSWORD: ${API_ENTRYPOINT_DB_PASSWORD}
+    volumes:
+      - api-entrypoint-pg-data:/var/lib/postgresql/data
+    ports:
+      - "7100:5432"
+    networks:
+      - fluent-prod-net
+
+  api-entrypoint:
+    image: scobca/fluent-api-entrypoint:latest
+    restart: always
+    environment:
+      API_ENTRYPOINT_DOPPLER_ACCESS_KEY: ${API_ENTRYPOINT_DOPPLER_ACCESS_KEY}
+    volumes:
+      - api-entrypoint-data:/var
+    ports:
+      - "7000:8080"
+    networks:
+      - fluent-prod-net
+
+volumes:
+  api-entrypoint-pg-data:
+  api-entrypoint-redis-data:
+  api-entrypoint-data:
+
+networks:
+  fluent-prod-net:
+    driver: bridge
