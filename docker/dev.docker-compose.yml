@@ -1,9 +1,9 @@
 name: "fluent-dev"
 services:
-  api-entrypoint-redis:
+  redis:
     image: redis:latest
     restart: always
-    command: [ "redis-server", "--requirepass", "${API_ENTRYPOINT_REDIS_PASSWORD}" ]
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
     volumes:
       - api-entrypoint-redis-data:/data
     ports:
@@ -24,7 +24,7 @@ services:
     networks:
       - fluent-dev-net
 
-  esc-task-tracker:
+  api-entrypoint:
     image: scobca/fluent-api-entrypoint:dev
     restart: always
     ports:
