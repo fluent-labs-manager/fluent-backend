@@ -29,10 +29,12 @@ services:
   api-entrypoint:
     image: scobca/fluent-api-entrypoint:latest
     restart: always
-    ports:
-      - "7000:8080"
+    environment:
+      API_ENTRYPOINT_DOPPLER_ACCESS_KEY: ${API_ENTRYPOINT_DOPPLER_ACCESS_KEY}
     volumes:
       - api-entrypoint-data:/var
+    ports:
+      - "7000:8080"
     networks:
       - fluent-prod-net
 
