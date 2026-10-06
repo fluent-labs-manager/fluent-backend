@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: api-entrypoint
+  servlet:
+    multipart:
+      max-file-size: 150MB
+      max-request-size: 150MB
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+
+server:
+  port: 8080
