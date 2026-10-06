@@ -16,13 +16,13 @@ dependencies {
 
     add("implementation", springBootBom)
     add("developmentOnly", springBootBom)
-    add("implementation", libs.requiredLibrary("springBootStarterWeb"))
     add("implementation", libs.requiredLibrary("springBootStarterValidation"))
     add("implementation", libs.requiredLibrary("kotlinReflect"))
     add("implementation", libs.requiredLibrary("kotlinxCoroutines"))
     add("implementation", libs.requiredLibrary("kotlinxCoroutinesReactor"))
     add("implementation", libs.requiredLibrary("kotlinxSerialization"))
     add("implementation", libs.requiredLibrary("reactorKotlinExtensions"))
+    add("implementation", libs.requiredLibrary("dotenvSpringBoot"))
 
     add("developmentOnly", libs.requiredLibrary("springBootDevtools"))
     add("testImplementation", libs.requiredLibrary("springBootStarterTest"))
