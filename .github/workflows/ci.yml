@@ -223,6 +223,8 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - uses: actions/checkout@v7
+
       - name: Configure SSH
         run: .github/scripts/setup-ssh.sh
         env:
@@ -251,6 +253,8 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - uses: actions/checkout@v7
+
       - name: Configure SSH
         run: .github/scripts/setup-ssh.sh
         env:
