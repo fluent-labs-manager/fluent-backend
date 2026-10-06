@@ -12,36 +12,20 @@ plugins {
 }
 
 dependencies {
-    val springBootBom = platform(libs.findLibrary("springBootDependencies").get())
+    val springBootBom = platform(libs.requiredLibrary("springBootDependencies"))
 
     add("implementation", springBootBom)
     add("developmentOnly", springBootBom)
-    add("implementation", libs.findLibrary("springBootStarterWeb").get())
-    add("implementation", libs.findLibrary("springBootStarterValidation").get())
-    add("implementation", libs.findLibrary("kotlinReflect").get())
-    add("implementation", libs.findLibrary("kotlinxCoroutines").get())
-    add("implementation", libs.findLibrary("kotlinxCoroutinesReactor").get())
-    add("implementation", libs.findLibrary("kotlinxSerialization").get())
-    add("implementation", libs.findLibrary("reactorKotlinExtensions").get())
+    add("implementation", libs.requiredLibrary("springBootStarterWeb"))
+    add("implementation", libs.requiredLibrary("springBootStarterValidation"))
+    add("implementation", libs.requiredLibrary("kotlinReflect"))
+    add("implementation", libs.requiredLibrary("kotlinxCoroutines"))
+    add("implementation", libs.requiredLibrary("kotlinxCoroutinesReactor"))
+    add("implementation", libs.requiredLibrary("kotlinxSerialization"))
+    add("implementation", libs.requiredLibrary("reactorKotlinExtensions"))
 
-    add("developmentOnly", libs.findLibrary("springBootDevtools").get())
-    add("testImplementation", libs.findLibrary("springBootStarterTest").get())
+    add("developmentOnly", libs.requiredLibrary("springBootDevtools"))
+    add("testImplementation", libs.requiredLibrary("springBootStarterTest"))
 }
 
-val excludedTestTags = providers.gradleProperty("excludeTestTags").orNull
-
-tasks.withType<Test> {
-    useJUnitPlatform {
-        excludedTestTags
-            ?.split(",")
-            ?.map(String::trim)
-            ?.filter(String::isNotBlank)
-            ?.let { excludeTags(*it.toTypedArray()) }
-    }
-
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
-
-    filter {
-        isFailOnNoMatchingTests = false
-    }
-}
+configureSpringAppTestConvention()

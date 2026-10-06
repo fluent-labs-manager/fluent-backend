@@ -10,8 +10,8 @@ plugins {
 }
 
 dependencies {
-    add("implementation", libs.findLibrary("springBootStarterDataJpa").get())
-    add("implementation", libs.findLibrary("flywayCore").get())
-    add("implementation", libs.findLibrary("flywayDatabasePostgresql").get())
-    add("runtimeOnly", libs.findLibrary("postgresql").get())
+    add("implementation", libs.requiredLibrary("springBootStarterDataJpa"))
+    add("implementation", libs.requiredLibrary("flywayCore"))
+    add("implementation", libs.requiredLibrary("flywayDatabasePostgresql"))
+    add("runtimeOnly", libs.requiredLibrary("postgresql"))
 }

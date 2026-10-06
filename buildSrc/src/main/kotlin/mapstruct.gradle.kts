@@ -9,6 +9,6 @@ plugins {
 }
 
 dependencies {
-    add("implementation", libs.findLibrary("mapstruct").get())
-    add("kapt", libs.findLibrary("mapstructProcessor").get())
+    add("implementation", libs.requiredLibrary("mapstruct"))
+    add("kapt", libs.requiredLibrary("mapstructProcessor"))
 }
