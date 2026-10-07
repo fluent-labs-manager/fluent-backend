@@ -24,5 +24,9 @@ redis:
   password: ${REDIS_PASSWORD}
   database: ${REDIS_DATABASE}
 
+services:
+    frontend-production: ${FRONTEND_PRODUCTION_HOST}
+    frontend-productionPattern: ${FRONTEND_PRODUCTION_HOST_PATTERN}
+
 server:
   port: 8080
