@@ -12,15 +12,20 @@ plugins {
 }
 
 dependencies {
-    add("implementation", platform(libs.findLibrary("springBootDependencies").get()))
-    add("implementation", libs.findLibrary("springBootStarterWeb").get())
-    add("implementation", libs.findLibrary("springBootStarterValidation").get())
-    add("implementation", libs.findLibrary("kotlinReflect").get())
-    add("implementation", libs.findLibrary("kotlinxCoroutines").get())
-    add("implementation", libs.findLibrary("kotlinxCoroutinesReactor").get())
-    add("implementation", libs.findLibrary("kotlinxSerialization").get())
-    add("implementation", libs.findLibrary("reactorKotlinExtensions").get())
+    val springBootBom = platform(libs.requiredLibrary("springBootDependencies"))
 
-    add("developmentOnly", libs.findLibrary("springBootDevtools").get())
-    add("testImplementation", libs.findLibrary("springBootStarterTest").get())
+    add("implementation", springBootBom)
+    add("developmentOnly", springBootBom)
+    add("implementation", libs.requiredLibrary("springBootStarterValidation"))
+    add("implementation", libs.requiredLibrary("kotlinReflect"))
+    add("implementation", libs.requiredLibrary("kotlinxCoroutines"))
+    add("implementation", libs.requiredLibrary("kotlinxCoroutinesReactor"))
+    add("implementation", libs.requiredLibrary("kotlinxSerialization"))
+    add("implementation", libs.requiredLibrary("reactorKotlinExtensions"))
+    add("implementation", libs.requiredLibrary("dotenvSpringBoot"))
+
+    add("developmentOnly", libs.requiredLibrary("springBootDevtools"))
+    add("testImplementation", libs.requiredLibrary("springBootStarterTest"))
 }
+
+configureSpringAppTestConvention()

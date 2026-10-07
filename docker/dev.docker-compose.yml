@@ -1,0 +1,46 @@
+name: "fluent-dev"
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    volumes:
+      - redis-data:/data
+    ports:
+      - "17200:6379"
+    networks:
+      - fluent-dev-net
+
+  api-entrypoint-pg:
+    image: postgres:18
+    restart: always
+    environment:
+      POSTGRES_USER: ${API_ENTRYPOINT_DB_USER}
+      POSTGRES_PASSWORD: ${API_ENTRYPOINT_DB_PASSWORD}
+    volumes:
+      - api-entrypoint-pg-data:/var/lib/postgresql
+    ports:
+      - "17100:5432"
+    networks:
+      - fluent-dev-net
+
+  api-entrypoint:
+    image: scobca/fluent-api-entrypoint:dev
+    restart: always
+    environment:
+      API_ENTRYPOINT_DOPPLER_ACCESS_KEY: ${API_ENTRYPOINT_DOPPLER_ACCESS_KEY}
+    volumes:
+      - api-entrypoint-data:/var/
+    ports:
+      - "17000:8080"
+    networks:
+      - fluent-dev-net
+
+volumes:
+  redis-data:
+  api-entrypoint-pg-data:
+  api-entrypoint-data:
+
+networks:
+  fluent-dev-net:
+    driver: bridge

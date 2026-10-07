@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: api-entrypoint
+  servlet:
+    multipart:
+      max-file-size: 150MB
+      max-request-size: 150MB
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+
+database:
+  url: ${DB_URL}
+  username: ${DB_USERNAME}
+  password: ${DB_PASSWORD}
+  schema: public
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  password: ${REDIS_PASSWORD}
+  database: ${REDIS_DATABASE}
+
+services:
+  frontend-production: ${FRONTEND_PRODUCTION_HOST}
+  frontend-productionPattern: ${FRONTEND_PRODUCTION_HOST_PATTERN}
+  users-service-uri: ${USERS_SERVICE_URI}
+
+server:
+  port: 8080

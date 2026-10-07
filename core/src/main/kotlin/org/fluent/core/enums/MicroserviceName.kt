@@ -1,0 +1,11 @@
+package org.fluent.core.enums
+
+enum class MicroserviceName {
+    API_ENTRYPOINT,
+    AUTH_SERVICE,
+    GRADE_SYNK_SERVICE,
+    NOTIFICATION_SERVICE,
+    QUEUE_SERVICE,
+    SPREADSHEET_CONNECTOR_SERVICE,
+    USER_SERVICE,
+}
