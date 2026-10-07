@@ -7,6 +7,10 @@ plugins {
 
 dependencies {
     implementation(project(":core"))
+    implementation(platform(libs.springCloudDependencies))
+    implementation(libs.springBootStarterWebflux)
+    implementation(libs.springCloudStarterGatewayServerWebflux)
+    testImplementation(libs.reactorTest)
 }
 
 tasks.bootJar {

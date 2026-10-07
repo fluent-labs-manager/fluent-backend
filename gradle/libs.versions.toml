@@ -3,11 +3,13 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 kotlinxDatetime = "0.8.0"
 kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.10.2"
 springBoot = "3.5.8"
+springCloud = "2025.0.3"
+dotenvSpringBoot = "1.0.0"
 conventionalCommits = "3.1.3"
 flyway = "11.13.2"
 jjwt = "0.12.6"
@@ -23,18 +25,23 @@ kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.r
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web" }
+springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
 springBootDependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+springCloudDependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "springCloud" }
+springCloudStarterGatewayServerWebflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux" }
 springBootGradlePlugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "springBoot" }
 springBootStarterDataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 flywayCore = { module = "org.flywaydb:flyway-core" }
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootDevtools = { module = "org.springframework.boot:spring-boot-devtools" }
+dotenvSpringBoot = { module = "one.stayfocused.spring:dotenv-spring-boot", version.ref = "dotenvSpringBoot" }
 flywayDatabasePostgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 postgresql = { module = "org.postgresql:postgresql" }
 kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinxCoroutines" }
 reactorKotlinExtensions = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions" }
+reactorTest = { module = "io.projectreactor:reactor-test" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
 jaxbApi = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxbApi" }
