@@ -25,8 +25,9 @@ redis:
   database: ${REDIS_DATABASE}
 
 services:
-    frontend-production: ${FRONTEND_PRODUCTION_HOST}
-    frontend-productionPattern: ${FRONTEND_PRODUCTION_HOST_PATTERN}
+  frontend-production: ${FRONTEND_PRODUCTION_HOST}
+  frontend-productionPattern: ${FRONTEND_PRODUCTION_HOST_PATTERN}
+  users-service-uri: ${USERS_SERVICE_URI}
 
 server:
   port: 8080

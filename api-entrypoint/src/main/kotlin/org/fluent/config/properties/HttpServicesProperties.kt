@@ -8,4 +8,5 @@ import org.springframework.context.annotation.Configuration
 class HttpServicesProperties {
     lateinit var frontendProduction: String
     lateinit var frontendProductionPattern: String
+    lateinit var usersServiceURI: String
 }
