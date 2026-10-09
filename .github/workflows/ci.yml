@@ -13,7 +13,8 @@ concurrency:
 jobs:
   validate-pr-source:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/dev'
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+
     steps:
       - name: Allow only dev -> main
         run: |
