@@ -11,7 +11,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate-pr-source:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
+    steps:
+      - name: Allow only dev -> main
+        run: |
+          if [[ "${{ github.head_ref }}" != "dev" ]]; then
+            echo "Pull requests to main must originate from dev."
+            exit 1
+          fi
+
   detect-affected-modules:
+    needs: validate-pr-source
+    if: needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped'
+
     runs-on: ubuntu-latest
     outputs:
       test_matrix: ${{ steps.detect.outputs.test_matrix }}
