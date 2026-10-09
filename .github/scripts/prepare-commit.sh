@@ -13,7 +13,7 @@ else
 fi
 
 COUNT=$(git rev-list --count "$commit_range")
-COMMIT_LIST=$(git log --format='- %s' "$commit_range")
+COMMIT_LIST=$(git log --reverse --format='- %s' "$commit_range")
 
 {
   echo "count=$COUNT"
