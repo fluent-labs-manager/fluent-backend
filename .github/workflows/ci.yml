@@ -25,7 +25,9 @@ jobs:
 
   detect-affected-modules:
     needs: validate-pr-source
-    if: needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped'
+    if: >-
+      always() &&
+      (needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped')
 
     runs-on: ubuntu-latest
     outputs:
@@ -55,7 +57,9 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: validate-pr-source
-    if: needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped'
+    if: >-
+      always() &&
+      (needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped')
 
     outputs:
       deployment_environment: ${{ steps.resolve.outputs.deployment_environment }}
@@ -74,7 +78,9 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: validate-pr-source
-    if: needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped'
+    if: >-
+      always() &&
+      (needs.validate-pr-source.result == 'success' || needs.validate-pr-source.result == 'skipped')
 
     steps:
       - uses: actions/checkout@v7
