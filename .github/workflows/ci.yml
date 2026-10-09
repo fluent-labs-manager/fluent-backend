@@ -331,10 +331,11 @@ jobs:
           message: |
             New commits in ${{ github.repository }}
 
-            ${{ github.actor }} has pushed ${{ steps.prepare.outputs.count }} commit(-s) to ${{ github.ref_name }}
+            Contributors:
+            ${{ steps.prepare.outputs.authors }}
+
+            ${{ steps.prepare.outputs.count }} commit(-s) pushed to ${{ github.ref_name }}
 
             ${{ steps.prepare.outputs.commit_list }}
 
             🔗 ${{ github.server_url }}/${{ github.repository }}/commits/${{ github.ref_name }}
-
-            #commit
