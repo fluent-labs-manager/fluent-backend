@@ -13,11 +13,16 @@ else
 fi
 
 COUNT=$(git rev-list --count "$commit_range")
-COMMIT_LIST=$(git log --format='- %s' "$commit_range")
+COMMIT_LIST=$(git log --reverse --format='- %s' "$commit_range")
+AUTHORS=$(git log --reverse --format='%aN' "$commit_range" \
+  | awk 'BEGIN { IGNORECASE=1 } $0 !~ /copilot/ && !seen[$0]++ { print "- " $0 }')
 
 {
   echo "count=$COUNT"
   echo "commit_list<<EOF"
   echo "$COMMIT_LIST"
+  echo "EOF"
+  echo "authors<<EOF"
+  echo "$AUTHORS"
   echo "EOF"
 } >> "$GITHUB_OUTPUT"
