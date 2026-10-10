@@ -13,5 +13,6 @@ dependencies {
     add("implementation", libs.requiredLibrary("springBootStarterDataJpa"))
     add("implementation", libs.requiredLibrary("flywayCore"))
     add("implementation", libs.requiredLibrary("flywayDatabasePostgresql"))
+    add("implementation", libs.requiredLibrary("uuidCreator"))
     add("runtimeOnly", libs.requiredLibrary("postgresql"))
 }
