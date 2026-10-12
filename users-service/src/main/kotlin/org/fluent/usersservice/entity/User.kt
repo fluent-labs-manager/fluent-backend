@@ -6,6 +6,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.PrePersist
 import jakarta.persistence.Table
 import org.fluent.usersservice.annotation.NotTrimmable
@@ -39,6 +40,9 @@ class User(
 
     @Id
     var id: UUID? = null,
+
+    @OneToMany(mappedBy = "user")
+    val roles: MutableSet<UserRole> = mutableSetOf()
 ) {
     @PrePersist
     fun generateId() {
