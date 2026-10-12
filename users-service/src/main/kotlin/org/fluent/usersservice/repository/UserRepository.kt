@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface UserRepository : JpaRepository<User, UUID>, JpaSpecificationExecutor<User>
+interface UserRepository : JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
+    fun findByEmail(email: String): User?
+}
