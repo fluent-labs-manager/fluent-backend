@@ -8,5 +8,8 @@ import org.mapstruct.Mapping
 @Mapper(componentModel = "spring")
 interface UsersMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     fun userFromDto(dto: CreateUserDto): User
 }
