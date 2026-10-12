@@ -15,6 +15,7 @@ flyway = "11.13.2"
 jjwt = "0.12.6"
 jaxbApi = "2.3.0"
 mapstruct = "1.5.3.Final"
+uuidCreator = "6.1.1"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -47,6 +48,7 @@ jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
 jaxbApi = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxbApi" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstructProcessor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+uuidCreator = { module = "com.github.f4b6a3:uuid-creator", version.ref = "uuidCreator" }
 conventionalCommitsGradlePlugin = { module = "it.nicolasfarabegoli.conventional-commits:it.nicolasfarabegoli.conventional-commits.gradle.plugin", version.ref = "conventionalCommits" }
 flywayGradlePlugin = { module = "org.flywaydb:flyway-gradle-plugin", version.ref = "flyway" }
 
