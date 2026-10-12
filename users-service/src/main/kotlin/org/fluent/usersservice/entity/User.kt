@@ -42,7 +42,7 @@ class User(
     var id: UUID? = null,
 
     @OneToMany(mappedBy = "user")
-    val roles: MutableSet<UserRole> = mutableSetOf()
+    var roles: MutableSet<UserRole> = mutableSetOf()
 ) {
     @PrePersist
     fun generateId() {
