@@ -1,5 +1,6 @@
 package org.fluent.usersservice.controller
 
+import org.fluent.core.enums.UserRoles
 import org.fluent.usersservice.dto.user.CreateUserDto
 import org.fluent.usersservice.dto.user.UpdateUserDto
 import org.fluent.usersservice.dto.user.UserFilterDto
@@ -38,6 +39,12 @@ class UserController(private val userService: UserService) {
 
     @PatchMapping("/{id}")
     fun update(@PathVariable id: UUID, dto: UpdateUserDto): User = userService.update(id, dto)
+
+    @PatchMapping("/addRole/{id}/{role}")
+    fun addRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.addRole(id, role)
+
+    @PatchMapping("/removeRole/{id}/{role}")
+    fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.removeRole(id, role)
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: UUID) = userService.delete(id)
