@@ -10,6 +10,7 @@ plugins {
 }
 
 include(":api-entrypoint")
+include(":users-service")
 include(":core")
 
 rootProject.name = "fluent-backend"

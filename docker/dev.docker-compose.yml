@@ -24,6 +24,19 @@ services:
     networks:
       - fluent-dev-net
 
+  users-service-pg:
+    image: postgres:18
+    restart: always
+    environment:
+      POSTGRES_USER: ${USERS_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${USERS_SERVICE_DB_PASSWORD}
+    volumes:
+      - users-service-pg-data:/var/lib/postgresql
+    ports:
+      - "17102:5432"
+    networks:
+      - fluent-dev-net
+
   api-entrypoint:
     image: scobca/fluent-api-entrypoint:dev
     restart: always
@@ -36,10 +49,24 @@ services:
     networks:
       - fluent-dev-net
 
+  users-service:
+    image: scobca/fluent-users-service:dev
+    restart: always
+    environment:
+      USERS_SERVICE_DOPPLER_ACCESS_KEY: ${USERS_SERVICE_DOPPLER_ACCESS_KEY}
+    volumes:
+      - users-service-data:/var/
+    ports:
+      - "17002:8082"
+    networks:
+      - fluent-dev-net
+
 volumes:
   redis-data:
   api-entrypoint-pg-data:
+  users-service-pg-data:
   api-entrypoint-data:
+  users-service-data:
 
 networks:
   fluent-dev-net:
