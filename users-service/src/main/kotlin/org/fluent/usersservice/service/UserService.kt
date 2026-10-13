@@ -65,6 +65,7 @@ class UserService(
             .let { user ->
                 user.let { userRoleMapper.userRoleFromUserAndRole(user, dto.role ?: UserRoles.STUDENT) }
                     .let(userRolesRepository::save)
+                    .let(user.roles::add)
 
                 return@let user
             }
@@ -82,6 +83,7 @@ class UserService(
         getById(userId).let { user ->
             userRoleMapper.userRoleFromUserAndRole(user, role)
                 .let(userRolesRepository::save)
+                .let(user.roles::add)
 
             return@let user
         }
