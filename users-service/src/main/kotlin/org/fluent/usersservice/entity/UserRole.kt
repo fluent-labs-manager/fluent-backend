@@ -1,5 +1,6 @@
 package org.fluent.usersservice.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.EmbeddedId
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -22,5 +23,6 @@ class UserRole {
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     lateinit var user: User
 }

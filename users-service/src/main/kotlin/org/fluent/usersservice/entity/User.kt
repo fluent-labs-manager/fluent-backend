@@ -21,6 +21,9 @@ import java.util.UUID
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener::class, TrimEntityListener::class)
 class User(
+    @Id
+    var id: UUID? = null,
+
     @Column(nullable = false)
     var name: String,
 
@@ -37,9 +40,6 @@ class User(
 
     @LastModifiedDate
     var updatedAt: Instant?,
-
-    @Id
-    var id: UUID? = null,
 
     @OneToMany(mappedBy = "user")
     var roles: MutableSet<UserRole> = mutableSetOf()
