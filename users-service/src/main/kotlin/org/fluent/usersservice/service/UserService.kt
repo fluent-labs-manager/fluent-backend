@@ -7,7 +7,6 @@ import org.fluent.usersservice.dto.user.CreateUserDto
 import org.fluent.usersservice.dto.user.UpdateUserDto
 import org.fluent.usersservice.dto.user.UserFilterDto
 import org.fluent.usersservice.entity.User
-import org.fluent.usersservice.entity.UserRole
 import org.fluent.usersservice.entity.UserRoleId
 import org.fluent.usersservice.repository.UserRepository
 import org.fluent.usersservice.repository.UserRolesRepository
