@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 
 @RestControllerAdvice
 class GlobalHttpExceptionsHandler {
@@ -62,11 +63,11 @@ class GlobalHttpExceptionsHandler {
      * @param ex The validation exception
      * @return ResponseEntity with HTTP 400 Bad Request and a generic validation message
      */
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<BasicErrorResponse> {
+    @ExceptionHandler(HandlerMethodValidationException::class)
+    fun handleValidationException(ex: HandlerMethodValidationException): ResponseEntity<BasicErrorResponse> {
         val errorResponse = BasicErrorResponse(
             status = HttpStatus.BAD_REQUEST.value(),
-            message = "Произошла ошибка при валидации входных параметров. Проверьте отправляемые данные."
+            message = "Произошла ошибка при валидации входных параметров запроса.",
         )
 
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
