@@ -51,7 +51,7 @@ class UserService(
     }
 
     fun getByEmail(email: String): User {
-        return repository.findByEmail(email) ?: throw NotFoundException(message = "")
+        return repository.findByEmail(email) ?: throw NotFoundException(message = "Пользователь с таким email не найден")
     }
 
     @Transactional
