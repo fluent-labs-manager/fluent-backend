@@ -51,7 +51,8 @@ class UserService(
     }
 
     fun getByEmail(email: String): User {
-        return repository.findByEmail(email) ?: throw NotFoundException(message = "Пользователь с таким email не найден")
+        return repository.findByEmail(email)
+            ?: throw NotFoundException(message = "Пользователь с таким email не найден")
     }
 
     @Transactional
@@ -75,7 +76,13 @@ class UserService(
     fun update(id: UUID, dto: UpdateUserDto): User =
         getById(id).apply {
             dto.name?.let { name = it }
-            dto.email?.let { email = it }
+            dto.email?.let { newEmail ->
+                val oldUser = repository.findByEmail(newEmail)
+                if (oldUser != null && oldUser != this)
+                    throw DoubleRecordException("Пользователь с email $newEmail уже существует.")
+
+                email = newEmail
+            }
         }.let(repository::save)
 
     @Transactional
