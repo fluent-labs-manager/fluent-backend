@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/removeRole/:id/:role"
+method: PATCH
+pathVariables:
+  id: 01a13cc9-7d2b-7e39-93ee-37d8600700ee
+  role: TEACHER
+examples: .resources/Remove role.resources/examples
+order: 7000

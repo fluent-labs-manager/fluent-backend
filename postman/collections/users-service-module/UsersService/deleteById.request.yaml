@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/:id"
+method: DELETE
+pathVariables:
+  id: 01a13cd3-5db0-7d74-8426-ba1620c7463c
+examples: .resources/deleteById.resources/examples
+order: 8000

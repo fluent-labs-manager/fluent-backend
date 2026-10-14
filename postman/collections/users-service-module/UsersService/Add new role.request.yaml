@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/addRole/:id/:role"
+method: PATCH
+pathVariables:
+  - key: id
+    value: 01a13cc9-7d2b-7e39-93ee-37d8600700ee
+    description: ""
+  - key: role
+    value: TEACHER
+    description: STUDENT | TEACHER | ADMIN
+examples: .resources/Add new role.resources/examples
+order: 6000

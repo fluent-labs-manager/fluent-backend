@@ -1,0 +1,91 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users?name=scobca&email&page&size&sort"
+  method: GET
+  queryParams:
+    - key: name
+      value: scobca
+      disabled: false
+      description: Filter by user name
+    - key: email
+      value: null
+      disabled: false
+      description: Filter by user email
+    - key: page
+      value: null
+      disabled: false
+      description: Response page number
+    - key: size
+      value: null
+      disabled: false
+      description: Response page size
+    - key: sort
+      value: null
+      disabled: false
+      description: Page sorting factor
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 16:31:13 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "message": {
+          "content": [
+            {
+              "id": "01a13722-bab0-7a7e-b10f-98b5da5e3560",
+              "name": "scobca",
+              "email": "scobca18@yandex.ru",
+              "createdAt": "2026-10-13T21:19:45.319984Z",
+              "updatedAt": "2026-10-13T21:19:45.319984Z",
+              "roles": [
+                {
+                  "id": {
+                    "userId": "01a13722-bab0-7a7e-b10f-98b5da5e3560",
+                    "role": "STUDENT"
+                  }
+                }
+              ]
+            }
+          ],
+          "pageable": {
+            "pageNumber": 0,
+            "pageSize": 20,
+            "sort": {
+              "empty": true,
+              "sorted": false,
+              "unsorted": true
+            },
+            "offset": 0,
+            "paged": true,
+            "unpaged": false
+          },
+          "last": true,
+          "totalElements": 1,
+          "totalPages": 1,
+          "first": true,
+          "size": 20,
+          "number": 0,
+          "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+          },
+          "numberOfElements": 1,
+          "empty": false
+        },
+        "status": 200
+      }
+order: 2000

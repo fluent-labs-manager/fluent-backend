@@ -1,0 +1,35 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+          "name": "Vladimir Fokin",
+          "email": "invalid",
+          "password": "password",
+          "role": "TEACHER"
+      }
+response:
+  statusCode: 400
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 23:43:58 GMT
+    connection: close
+  body:
+    type: json
+    content: |-
+      {
+        "status": 400,
+        "message": "Произошла ошибка при валидации входных параметров запроса."
+      }
+order: 3000
