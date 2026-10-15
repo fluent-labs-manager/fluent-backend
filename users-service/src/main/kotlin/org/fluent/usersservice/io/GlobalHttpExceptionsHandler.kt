@@ -2,12 +2,15 @@ package org.fluent.usersservice.io
 
 import org.fluent.core.api.BasicErrorResponse
 import org.fluent.core.exceptions.AbstractHttpException
+import org.fluent.core.exceptions.WRONG_UUID_FORMAT
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import java.util.UUID
 
 @RestControllerAdvice
 class GlobalHttpExceptionsHandler {
@@ -81,5 +84,23 @@ class GlobalHttpExceptionsHandler {
         )
 
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleTypeMismatch(
+        ex: MethodArgumentTypeMismatchException
+    ): ResponseEntity<BasicErrorResponse> {
+        val message = when (ex.requiredType) {
+            UUID::class.java -> WRONG_UUID_FORMAT
+            else -> "Некорректное значение параметра '${ex.name}'"
+        }
+
+        return ResponseEntity(
+            BasicErrorResponse(
+                status = HttpStatus.BAD_REQUEST.value(),
+                message = message,
+            ),
+            HttpStatus.BAD_REQUEST,
+        )
     }
 }
