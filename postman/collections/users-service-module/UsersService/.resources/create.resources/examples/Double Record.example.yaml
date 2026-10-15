@@ -1,0 +1,36 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+          "name": "scobca",
+          "email": "scobca18@yandex.ru",
+          "password": "password",
+          "role": "STUDENT"
+      }
+response:
+  statusCode: 409
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 16:21:27 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "status": 409,
+        "message": "Пользователь с email scobca18@yandex.ru уже существует."
+      }
+order: 2000

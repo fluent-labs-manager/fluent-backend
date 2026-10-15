@@ -72,4 +72,14 @@ class GlobalHttpExceptionsHandler {
 
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<BasicErrorResponse> {
+        val errorResponse = BasicErrorResponse(
+            status = HttpStatus.BAD_REQUEST.value(),
+            message = "Произошла ошибка при валидации входных параметров запроса.",
+        )
+
+        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
+    }
 }

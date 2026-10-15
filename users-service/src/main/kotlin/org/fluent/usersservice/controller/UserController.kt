@@ -2,6 +2,7 @@ package org.fluent.usersservice.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
+import org.fluent.core.api.BasicSuccessfulResponse
 import org.fluent.core.enums.UserRoles
 import org.fluent.usersservice.dto.user.CreateUserDto
 import org.fluent.usersservice.dto.user.UpdateUserDto
@@ -54,8 +55,8 @@ class UserController(private val userService: UserService) {
     fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.removeRole(id, role)
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: UUID) = userService.delete(id)
+    fun delete(@PathVariable id: UUID) = BasicSuccessfulResponse(userService.delete(id))
 
     @DeleteMapping
-    fun deleteAll() = userService.deleteAll()
+    fun deleteAll() = BasicSuccessfulResponse(userService.deleteAll())
 }

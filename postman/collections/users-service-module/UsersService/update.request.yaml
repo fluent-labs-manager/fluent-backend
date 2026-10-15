@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/:id"
+method: PATCH
+pathVariables:
+  id: 01a13722-bab0-7a7e-b10f-98b5da5e3560
+body:
+  type: json
+  content: |-
+    {
+        "name": "Vladimir Fokin",
+        "email": "scobca18@yandex.ru"
+    }
+examples: .resources/update.resources/examples
+order: 5000

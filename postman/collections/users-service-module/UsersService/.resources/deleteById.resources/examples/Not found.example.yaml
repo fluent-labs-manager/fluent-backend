@@ -1,0 +1,29 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users/:id"
+  method: DELETE
+  pathVariables:
+    id: 01a13cd3-5db0-7d74-8426-ba1620c7463c
+response:
+  statusCode: 404
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 23:52:41 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "status": 404,
+        "message": "Пользователь с таким ID не найден"
+      }
+order: 2000

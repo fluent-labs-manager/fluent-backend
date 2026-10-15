@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/getByEmail/:email"
+method: GET
+pathVariables:
+  - key: email
+    value: scobca18@yandex.ru
+    description: ""
+examples: .resources/getByEmail.resources/examples
+order: 3000

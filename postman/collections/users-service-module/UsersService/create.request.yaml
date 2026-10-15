@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  # Roles assigment
+
+  You can provide 3 types of User Role:
+
+  - STUDENT
+      
+  - TEACHER
+      
+  - ADMIN
+      
+
+  By 1 creation request you can assign only 1 role. If you need add 2+ roles -> use `addRole`endpoint
+url: "{{url}}/api/v1/users"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "name": "Vladimir Fokin",
+        "email": "scobca18@yandex.ru",
+        "password": "password",
+        "role": "TEACHER"
+    }
+examples: .resources/create.resources/examples
+order: 4000
