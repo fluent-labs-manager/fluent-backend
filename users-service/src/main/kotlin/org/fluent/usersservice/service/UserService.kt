@@ -73,8 +73,11 @@ class UserService(
     }
 
     @Transactional
-    fun update(id: UUID, dto: UpdateUserDto): User =
-        getById(id).apply {
+    fun update(id: UUID, dto: UpdateUserDto): User {
+        val user = repository.findByIdOrNull(id)
+            ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
+
+        return user.apply {
             dto.name?.let { name = it }
             dto.email?.let { newEmail ->
                 val oldUser = repository.findByEmail(newEmail)
@@ -84,27 +87,34 @@ class UserService(
                 email = newEmail
             }
         }.let(repository::save)
+    }
 
     @Transactional
     fun addRole(userId: UUID, role: UserRoles): User =
-        getById(userId).let { user ->
-            userRoleMapper.userRoleFromUserAndRole(user, role)
-                .let(userRolesRepository::save)
-                .let(user.roles::add)
+        repository.findByIdOrNull(userId)
+            ?.let { user ->
+                userRoleMapper.userRoleFromUserAndRole(user, role)
+                    .let(userRolesRepository::save)
+                    .let(user.roles::add)
 
-            return@let user
-        }
+                return@let user
+            }
+            ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
     @Transactional
     fun removeRole(userId: UUID, role: UserRoles): User =
-        getById(userId).let { user ->
-            userRolesRepository.deleteById(UserRoleId(userId = userId, role = role))
-            return@let user
-        }
+        repository.findByIdOrNull(userId)
+            ?.let { user ->
+                userRolesRepository.deleteById(UserRoleId(userId = userId, role = role))
+                return@let user
+            }
+            ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
     @Transactional
-    fun delete(id: UUID): String {
-        getById(id).let(repository::delete)
+    fun delete(userId: UUID): String {
+        repository.findByIdOrNull(userId)
+            ?.let(repository::delete)
+            ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
         return "Пользователь удален успешно."
     }
 
