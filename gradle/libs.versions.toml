@@ -24,6 +24,7 @@ kotlinNoargGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-noarg", versio
 kotlinSerializationGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
+kotlinxSerializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 springBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web" }
 springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }

@@ -4,5 +4,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.kotlinxSerializationCore)
+
     testImplementation(kotlin("test"))
 }
