@@ -15,6 +15,7 @@ import org.fluent.usersservice.repository.mapper.UserRoleMapper
 import org.fluent.usersservice.repository.mapper.UsersMapper
 import org.fluent.usersservice.repository.spec.UsersSpecifications
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
@@ -49,14 +50,14 @@ class UserService(
             .map(usersMapper::userDtoFromUser)
     }
 
-    @Cacheable(cacheNames = ["userByUUID"], key = "#userId")
+    @Cacheable(cacheNames = ["users:v1:by-id"], key = "#userId")
     fun getById(userId: UUID): UserDto {
         return repository.findByIdOrNull(userId)
             ?.let(usersMapper::userDtoFromUser)
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
     }
 
-    @Cacheable(cacheNames = ["userByEmail"], key = "#email")
+    @Cacheable(cacheNames = ["users:v1:by-email"], key = "#email")
     fun getByEmail(email: String): UserDto {
         return repository.findByEmail(email)
             ?.let(usersMapper::userDtoFromUser)
@@ -65,9 +66,9 @@ class UserService(
 
     @Transactional
     @Caching(
-        cacheable = [
-            Cacheable(cacheNames = ["userByUUID"], key = "#result.id"),
-            Cacheable(cacheNames = ["userByEmail"], key = "#result.email"),
+        put = [
+            CachePut(cacheNames = ["users:v1:by-id"], key = "#result.id"),
+            CachePut(cacheNames = ["users:v1:by-email"], key = "#result.email"),
         ]
     )
     fun create(dto: CreateUserDto): UserDto {
@@ -89,8 +90,8 @@ class UserService(
     @Transactional
     @Caching(
         evict = [
-            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
-            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+            CacheEvict(cacheNames = ["users:v1:by-email"], key = "#result.email"),
+            CacheEvict(cacheNames = ["users:v1:by-id"], key = "#result.id"),
         ]
     )
     fun update(userId: UUID, dto: UpdateUserDto): UserDto {
@@ -115,8 +116,8 @@ class UserService(
     @Transactional
     @Caching(
         evict = [
-            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
-            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+            CacheEvict(cacheNames = ["users:v1:by-email"], key = "#result.email"),
+            CacheEvict(cacheNames = ["users:v1:by-id"], key = "#result.id"),
         ]
     )
     fun addRole(userId: UUID, role: UserRoles): UserDto =
@@ -133,8 +134,8 @@ class UserService(
     @Transactional
     @Caching(
         evict = [
-            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
-            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+            CacheEvict(cacheNames = ["users:v1:by-email"], key = "#result.email"),
+            CacheEvict(cacheNames = ["users:v1:by-id"], key = "#result.id"),
         ]
     )
     fun removeRole(userId: UUID, role: UserRoles): UserDto =
@@ -148,8 +149,8 @@ class UserService(
     @Transactional
     @Caching(
         evict = [
-            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
-            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+            CacheEvict(cacheNames = ["users:v1:by-email"], key = "#result.email"),
+            CacheEvict(cacheNames = ["users:v1:by-id"], key = "#result.id"),
         ]
     )
     fun delete(userId: UUID): DeletedUser {
@@ -169,8 +170,8 @@ class UserService(
     @Transactional
     @Caching(
         evict = [
-            CacheEvict(cacheNames = ["userByEmail"], allEntries = true),
-            CacheEvict(cacheNames = ["userByUUID"], allEntries = true),
+            CacheEvict(cacheNames = ["users:v1:by-email"], allEntries = true),
+            CacheEvict(cacheNames = ["users:v1:by-id"], allEntries = true),
         ]
     )
     fun deleteAll(): String {
