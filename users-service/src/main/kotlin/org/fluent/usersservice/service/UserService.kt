@@ -48,18 +48,26 @@ class UserService(
         return repository.findAll(Specification.allOf(specs), pageable)
     }
 
+    @Cacheable(cacheNames = ["userByUUID"], key = "#userId")
     fun getById(userId: UUID): User {
         return repository.findByIdOrNull(userId) ?: throw NotFoundException(
             message = "Пользователь с таким ID не найден"
         )
     }
 
+    @Cacheable(cacheNames = ["userByEmail"], key = "#email")
     fun getByEmail(email: String): User {
         return repository.findByEmail(email)
             ?: throw NotFoundException(message = "Пользователь с таким email не найден")
     }
 
     @Transactional
+    @Caching(
+        cacheable = [
+            Cacheable(cacheNames = ["userByUUID"], key = "#result.id"),
+            Cacheable(cacheNames = ["userByEmail"], key = "#result.email"),
+        ]
+    )
     fun create(dto: CreateUserDto): User {
         repository.findByEmail(dto.email)
             ?.let { user -> throw DoubleRecordException(message = "Пользователь с email ${user.email} уже существует.") }
@@ -77,6 +85,12 @@ class UserService(
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
+            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+        ]
+    )
     fun update(userId: UUID, dto: UpdateUserDto): User {
         val user = repository.findByIdOrNull(userId)
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
@@ -94,6 +108,12 @@ class UserService(
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
+            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+        ]
+    )
     fun addRole(userId: UUID, role: UserRoles): User =
         repository.findByIdOrNull(userId)
             ?.let { user ->
@@ -106,6 +126,12 @@ class UserService(
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
+            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+        ]
+    )
     fun removeRole(userId: UUID, role: UserRoles): User =
         repository.findByIdOrNull(userId)
             ?.let { user ->
@@ -115,6 +141,12 @@ class UserService(
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = ["userByEmail"], key = "#result.email"),
+            CacheEvict(cacheNames = ["userByUUID"], key = "#result.id"),
+        ]
+    )
     fun delete(userId: UUID): DeletedUser {
         val user = repository.findByIdOrNull(userId)
             ?: throw NotFoundException("Пользователь с таким ID не найден")
