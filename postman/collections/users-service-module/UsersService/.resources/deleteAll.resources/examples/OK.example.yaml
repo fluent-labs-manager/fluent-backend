@@ -1,0 +1,27 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users"
+  method: DELETE
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 23:53:07 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Все пользователи удалены.",
+        "status": 200
+      }
+order: 1000

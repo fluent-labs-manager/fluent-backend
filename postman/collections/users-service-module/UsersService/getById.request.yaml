@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{url}}/api/v1/users/:id"
+method: GET
+pathVariables:
+  - key: id
+    value: 01a1464b-bcdc-74c8-82ae-969fba4a81c1
+    description: User UUID
+examples: .resources/getById.resources/examples
+order: 2000

@@ -1,0 +1,26 @@
+$kind: http-request
+url: "{{url}}/api/v1/users?size=10&sort=asc"
+method: GET
+queryParams:
+  - key: name
+    value: scobca
+    disabled: true
+    description: Filter by user name
+  - key: email
+    value: scobca18@yandex.ru
+    disabled: true
+    description: Filter by user email
+  - key: page
+    value: "0"
+    disabled: true
+    description: Response page number
+  - key: size
+    value: "10"
+    disabled: false
+    description: Response page size
+  - key: sort
+    value: asc
+    disabled: false
+    description: Page sorting factor
+examples: .resources/getAll.resources/examples
+order: 1000

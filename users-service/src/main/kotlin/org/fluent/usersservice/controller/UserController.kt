@@ -2,11 +2,13 @@ package org.fluent.usersservice.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
+import org.fluent.core.api.BasicSuccessfulResponse
+import org.fluent.core.api.toHttpResponse
+import org.fluent.core.dto.io.UserDto
 import org.fluent.core.enums.UserRoles
 import org.fluent.usersservice.dto.user.CreateUserDto
 import org.fluent.usersservice.dto.user.UpdateUserDto
 import org.fluent.usersservice.dto.user.UserFilterDto
-import org.fluent.usersservice.entity.User
 import org.fluent.usersservice.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -29,33 +31,38 @@ class UserController(private val userService: UserService) {
     fun getAll(
         @ModelAttribute filters: UserFilterDto,
         pageable: Pageable
-    ): Page<User> = userService.getAll(filters, pageable)
+    ): Page<UserDto> = userService.getAll(filters, pageable)
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: UUID): User = userService.getById(id)
+    fun getById(@PathVariable id: UUID) = userService.getById(id).toHttpResponse()
 
     @GetMapping("/getByEmail/{email}")
     fun getByEmail(
         @Email(message = "Некорректный email")
         @PathVariable
         email: String
-    ): User = userService.getByEmail(email)
+    ) = userService.getByEmail(email).toHttpResponse()
 
     @PostMapping
-    fun create(@Valid @RequestBody dto: CreateUserDto): User = userService.create(dto)
+    fun create(@Valid @RequestBody dto: CreateUserDto) = userService.create(dto).toHttpResponse()
 
     @PatchMapping("/{id}")
-    fun update(@PathVariable id: UUID, @Valid @RequestBody dto: UpdateUserDto): User = userService.update(id, dto)
+    fun update(@PathVariable id: UUID, @Valid @RequestBody dto: UpdateUserDto) =
+        userService.update(id, dto).toHttpResponse()
 
     @PatchMapping("/addRole/{id}/{role}")
-    fun addRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.addRole(id, role)
+    fun addRole(@PathVariable id: UUID, @PathVariable role: UserRoles) = userService.addRole(id, role).toHttpResponse()
 
     @PatchMapping("/removeRole/{id}/{role}")
-    fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.removeRole(id, role)
+    fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles) =
+        userService.removeRole(id, role).toHttpResponse()
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: UUID) = userService.delete(id)
+    fun delete(@PathVariable id: UUID): BasicSuccessfulResponse<String> {
+        userService.delete(id)
+        return BasicSuccessfulResponse("Пользователь удален успешно.")
+    }
 
     @DeleteMapping
-    fun deleteAll() = userService.deleteAll()
+    fun deleteAll() = BasicSuccessfulResponse(userService.deleteAll())
 }

@@ -1,0 +1,44 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users/removeRole/:id/:role"
+  method: PATCH
+  pathVariables:
+    id: 01a13cc9-7d2b-7e39-93ee-37d8600700ee
+    role: TEACHER
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Wed, 14 Oct 2026 23:48:13 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "message": {
+          "id": "01a13cc9-7d2b-7e39-93ee-37d8600700ee",
+          "name": "Vladimir Fokin",
+          "email": "467883@edu.itmo.ru",
+          "createdAt": "2026-10-14T23:40:00.165219Z",
+          "updatedAt": "2026-10-14T23:40:00.165219Z",
+          "roles": [
+            {
+              "id": {
+                "userId": "01a13cc9-7d2b-7e39-93ee-37d8600700ee",
+                "role": "STUDENT"
+              }
+            }
+          ]
+        },
+        "status": 200
+      }
+order: 1000
