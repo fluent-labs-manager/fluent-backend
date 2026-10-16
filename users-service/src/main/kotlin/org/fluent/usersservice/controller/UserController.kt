@@ -3,6 +3,7 @@ package org.fluent.usersservice.controller
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import org.fluent.core.api.BasicSuccessfulResponse
+import org.fluent.core.api.toHttpResponse
 import org.fluent.core.dto.io.UserDto
 import org.fluent.core.enums.UserRoles
 import org.fluent.usersservice.dto.user.CreateUserDto
@@ -33,26 +34,28 @@ class UserController(private val userService: UserService) {
     ): Page<UserDto> = userService.getAll(filters, pageable)
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: UUID): UserDto = userService.getById(id)
+    fun getById(@PathVariable id: UUID) = userService.getById(id).toHttpResponse()
 
     @GetMapping("/getByEmail/{email}")
     fun getByEmail(
         @Email(message = "Некорректный email")
         @PathVariable
         email: String
-    ): UserDto = userService.getByEmail(email)
+    ) = userService.getByEmail(email).toHttpResponse()
 
     @PostMapping
-    fun create(@Valid @RequestBody dto: CreateUserDto): UserDto = userService.create(dto)
+    fun create(@Valid @RequestBody dto: CreateUserDto) = userService.create(dto).toHttpResponse()
 
     @PatchMapping("/{id}")
-    fun update(@PathVariable id: UUID, @Valid @RequestBody dto: UpdateUserDto): UserDto = userService.update(id, dto)
+    fun update(@PathVariable id: UUID, @Valid @RequestBody dto: UpdateUserDto) =
+        userService.update(id, dto).toHttpResponse()
 
     @PatchMapping("/addRole/{id}/{role}")
-    fun addRole(@PathVariable id: UUID, @PathVariable role: UserRoles): UserDto = userService.addRole(id, role)
+    fun addRole(@PathVariable id: UUID, @PathVariable role: UserRoles) = userService.addRole(id, role).toHttpResponse()
 
     @PatchMapping("/removeRole/{id}/{role}")
-    fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles): UserDto = userService.removeRole(id, role)
+    fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles) =
+        userService.removeRole(id, role).toHttpResponse()
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: UUID): BasicSuccessfulResponse<String> {
