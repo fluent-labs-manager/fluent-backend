@@ -2,6 +2,7 @@ plugins {
     id("buildsrc.convention.spring-app")
     id("buildsrc.convention.postgres-plugin")
     id("buildsrc.convention.security-plugin")
+    id("buildsrc.convention.redis-cache-plugin")
     id("buildsrc.convention.mapstruct")
 }
 
