@@ -2,6 +2,7 @@ package org.fluent.usersservice.io
 
 import org.fluent.core.api.BasicErrorResponse
 import org.fluent.core.exceptions.AbstractHttpException
+import org.fluent.core.exceptions.WRONG_ENUM_FORMAT
 import org.fluent.core.exceptions.WRONG_UUID_FORMAT
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -90,9 +91,15 @@ class GlobalHttpExceptionsHandler {
     fun handleTypeMismatch(
         ex: MethodArgumentTypeMismatchException
     ): ResponseEntity<BasicErrorResponse> {
-        val message = when (ex.requiredType) {
-            UUID::class.java -> WRONG_UUID_FORMAT
-            else -> "Некорректное значение параметра '${ex.name}'"
+        val message = when {
+            ex.requiredType == UUID::class.java ->
+                WRONG_UUID_FORMAT
+
+            ex.requiredType?.isEnum == true ->
+                "$WRONG_ENUM_FORMAT '${ex.name}'"
+
+            else ->
+                "Некорректное значение параметра '${ex.name}'"
         }
 
         return ResponseEntity(
