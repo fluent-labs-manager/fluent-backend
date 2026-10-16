@@ -1,0 +1,29 @@
+$kind: http-example
+request:
+  url: "{{url}}/api/v1/users/removeRole/:id/:role"
+  method: PATCH
+  pathVariables:
+    id: 01a13cc9-7d2b-7e39-93ee-37d8600700ee
+    role: INVALID
+response:
+  statusCode: 400
+  statusText: ""
+  headers:
+    x-content-type-options: nosniff
+    x-xss-protection: "0"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    pragma: no-cache
+    expires: "0"
+    x-frame-options: DENY
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 16 Oct 2026 18:57:46 GMT
+    connection: close
+  body:
+    type: json
+    content: |-
+      {
+        "status": 400,
+        "message": "Неверный формат Enum 'role'"
+      }
+order: 3000
