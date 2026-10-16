@@ -4,6 +4,7 @@ import org.fluent.core.enums.UserRoles
 import org.fluent.core.exceptions.DoubleRecordException
 import org.fluent.core.exceptions.NotFoundException
 import org.fluent.usersservice.dto.user.CreateUserDto
+import org.fluent.usersservice.dto.user.DeletedUser
 import org.fluent.usersservice.dto.user.UpdateUserDto
 import org.fluent.usersservice.dto.user.UserFilterDto
 import org.fluent.usersservice.entity.User
@@ -13,6 +14,9 @@ import org.fluent.usersservice.repository.UserRolesRepository
 import org.fluent.usersservice.repository.mapper.UserRoleMapper
 import org.fluent.usersservice.repository.mapper.UsersMapper
 import org.fluent.usersservice.repository.spec.UsersSpecifications
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -73,8 +77,8 @@ class UserService(
     }
 
     @Transactional
-    fun update(id: UUID, dto: UpdateUserDto): User {
-        val user = repository.findByIdOrNull(id)
+    fun update(userId: UUID, dto: UpdateUserDto): User {
+        val user = repository.findByIdOrNull(userId)
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
         return user.apply {
@@ -111,14 +115,27 @@ class UserService(
             ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
 
     @Transactional
-    fun delete(userId: UUID): String {
-        repository.findByIdOrNull(userId)
-            ?.let(repository::delete)
-            ?: throw NotFoundException(message = "Пользователь с таким ID не найден")
-        return "Пользователь удален успешно."
+    fun delete(userId: UUID): DeletedUser {
+        val user = repository.findByIdOrNull(userId)
+            ?: throw NotFoundException("Пользователь с таким ID не найден")
+
+        val deletedUser = DeletedUser(
+            id = user.id!!,
+            email = user.email,
+        )
+
+        repository.delete(user)
+
+        return deletedUser
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = ["userByEmail"], allEntries = true),
+            CacheEvict(cacheNames = ["userByUUID"], allEntries = true),
+        ]
+    )
     fun deleteAll(): String {
         repository.deleteAll()
         return "Все пользователи удалены."

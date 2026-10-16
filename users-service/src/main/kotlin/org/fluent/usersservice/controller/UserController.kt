@@ -55,7 +55,10 @@ class UserController(private val userService: UserService) {
     fun removeRole(@PathVariable id: UUID, @PathVariable role: UserRoles): User = userService.removeRole(id, role)
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: UUID) = BasicSuccessfulResponse(userService.delete(id))
+    fun delete(@PathVariable id: UUID): BasicSuccessfulResponse<String> {
+        userService.delete(id)
+        return BasicSuccessfulResponse("Пользователь удален успешно.")
+    }
 
     @DeleteMapping
     fun deleteAll() = BasicSuccessfulResponse(userService.deleteAll())
