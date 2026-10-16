@@ -15,6 +15,11 @@ spring:
       database: ${REDIS_DATABASE:0}
       timeout: 1s
 
+logging:
+  level:
+    org.springframework.cache: INFO
+    org.springframework.data.redis: INFO
+
 database:
   url: ${USERS_SERVICE_DB_URL}
   username: ${USERS_SERVICE_DB_USERNAME}
