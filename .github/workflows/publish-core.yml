@@ -1,0 +1,26 @@
+name: Publish core to GitHub Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-core:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: ./.github/actions/setup-java
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Publish core
+        run: ./gradlew :core:publish --no-daemon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
